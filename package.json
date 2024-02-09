@@ -1,0 +1,8 @@
+{
+  "name": "finscan-pro",
+  "version": "1.0.0",
+  "description": "An application to scan documents",
+  "repository": "https://github.com/clinton1719/finscan-pro",
+  "author": "Clinton Fernandes",
+  "license": "MIT"
+}
