@@ -1,6 +1,10 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import App from '../App';
 
+afterEach(() => {
+  cleanup();
+});
+
 describe('renders App component', () => {
   beforeEach(() => {
     render(<App />);
@@ -20,7 +24,7 @@ describe('renders App component', () => {
   });
 });
 
-describe('renders HomePage when page is "home" by default', () => {
+describe('renders HomePage when page is home by default', () => {
   beforeEach(() => {
     render(<App />);
   });
@@ -40,9 +44,9 @@ describe('renders HomePage when page is "home" by default', () => {
     expect(formElement).toBeInTheDocument();
   });
 
-  // TODO Rewrite after creating results page
+  
   it('should not render results page', () => {
-    const resultsPage = screen.getByText('Results Page');
-    expect(resultsPage).not.toBeInTheDocument();
-  })
+    const resultsPage = screen.queryByText('Results Page');
+    expect(resultsPage).toBeNull();
+  });
 });
