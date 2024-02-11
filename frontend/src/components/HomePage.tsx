@@ -13,9 +13,11 @@ const HomePage = ({ setPage }: HomePage) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+
     try {
-      setIsLoading(true)
-      const response = await uploadFile(); 
+      setIsLoading(true);
+      await new Promise((f) => setTimeout(f, 3000));
+      const response = await uploadFile();
       console.log('API response:', response);
       setIsLoading(false);
       setPage('home');
@@ -41,9 +43,7 @@ const HomePage = ({ setPage }: HomePage) => {
                 accept=".pdf"
               />
             </label>
-            <button type="submit" >
-              Submit
-            </button>
+            <button type="submit">Submit</button>
           </form>
         </>
       )}

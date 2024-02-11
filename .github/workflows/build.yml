@@ -1,0 +1,32 @@
+name: Continous Deployment
+
+on:
+  push:
+    branches:
+      - feature/*
+      - main
+
+permissions: write-all
+
+jobs:
+  build-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'yarn'
+
+      - name: Install project dependencies
+        run: yarn --prefer-offline
+
+      - name: Run Lint
+        run: yarn fe:lint
+
+      - name: Run Build
+        run: yarn fe:build
+
+      - name: Run Tests
+        run: yarn fe:test

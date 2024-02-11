@@ -4,5 +4,17 @@
   "description": "An application to scan documents",
   "repository": "https://github.com/clinton1719/finscan-pro",
   "author": "Clinton Fernandes",
-  "license": "MIT"
+  "license": "MIT",
+  "workspaces": {
+    "packages": [
+      "frontend"
+    ]
+  },
+  "scripts": {
+    "fe:dev": "yarn workspace dev",
+    "fe:build": "yarn workspace build",
+    "fe:lint": "yarn workspace lint",
+    "fe:test": "yarn workspace test",
+    "fe:coverage": "yarn workspace coverage"
+  }
 }
