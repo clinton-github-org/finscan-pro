@@ -15,7 +15,7 @@
     "fe:dev": "yarn workspace frontend dev",
     "fe:build": "yarn workspace frontend build",
     "fe:lint": "yarn workspace frontend lint",
-    "fe:test": "yarn workspace frontend test",
+    "fe:test": "yarn workspace frontend test --verbose",
     "fe:coverage": "yarn workspace frontend coverage"
   }
 }
