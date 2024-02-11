@@ -30,3 +30,7 @@ jobs:
 
       - name: Run Tests
         run: yarn fe:test
+
+      - name: Job was successfully executed! Hurray! 🥳
+        if: success()
+        run: echo "All steps executed successfully. Infer details from each step for further processing"
