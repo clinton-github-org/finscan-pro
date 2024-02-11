@@ -4,6 +4,7 @@ import ResultsPage from './components/ResultsPage';
 
 const App = () => {
   const [page, setPage] = useState('home');
+
   return (
     <main className="site">
       <header className="heading_logo">

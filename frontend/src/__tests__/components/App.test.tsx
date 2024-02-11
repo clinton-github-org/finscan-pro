@@ -1,8 +1,7 @@
 /** @jest-environment jsdom */
-import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
-import App from '../App';
+import { cleanup, render, screen } from '@testing-library/react';
+import App from '../../App';
 
 afterEach(() => {
   cleanup();
@@ -47,7 +46,6 @@ describe('renders HomePage when page is home by default', () => {
     expect(formElement).toBeInTheDocument();
   });
 
-  
   it('should not render results page', () => {
     const resultsPage = screen.queryByText('Results Page');
     expect(resultsPage).toBeNull();
