@@ -12,10 +12,10 @@
     ]
   },
   "scripts": {
-    "fe:dev": "yarn workspace dev",
-    "fe:build": "yarn workspace build",
-    "fe:lint": "yarn workspace lint",
-    "fe:test": "yarn workspace test",
-    "fe:coverage": "yarn workspace coverage"
+    "fe:dev": "yarn workspace frontend dev",
+    "fe:build": "yarn workspace frontend build",
+    "fe:lint": "yarn workspace frontend lint",
+    "fe:test": "yarn workspace frontend test",
+    "fe:coverage": "yarn workspace frontend coverage"
   }
 }

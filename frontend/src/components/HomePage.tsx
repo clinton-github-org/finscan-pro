@@ -5,7 +5,6 @@ interface HomePage {
   setPage: Dispatch<SetStateAction<string>>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const HomePage = ({ setPage }: HomePage) => {
   const [isLoading, setIsLoading] = useState(false);
 
