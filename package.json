@@ -4,6 +4,7 @@
   "description": "An application to scan documents",
   "repository": "https://github.com/clinton1719/finscan-pro",
   "author": "Clinton Fernandes",
+  "private": "true",
   "license": "MIT",
   "workspaces": {
     "packages": [
