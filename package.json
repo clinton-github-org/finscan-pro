@@ -16,6 +16,8 @@
     "fe:build": "yarn workspace frontend build",
     "fe:lint": "yarn workspace frontend lint",
     "fe:test": "yarn workspace frontend test --verbose",
-    "fe:coverage": "yarn workspace frontend coverage"
+    "fe:coverage": "yarn workspace frontend coverage",
+    "be:rl:build": "cd lambdas/requestLambda && mvn clean install",
+    "sam scripts": "sam build && sam local start-api"
   }
 }
