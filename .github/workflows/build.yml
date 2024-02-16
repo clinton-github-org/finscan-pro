@@ -48,5 +48,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+          cache: maven
       - name: Build project
         run: yarn be:rl:build
