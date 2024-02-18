@@ -18,9 +18,9 @@ describe('should upload file successfully', () => {
     });
 
     it('should have right response', async () => {
-        const response = await uploadFile();
+        await uploadFile();
 
-        expect(response.data).toBe(response.data);
+        // expect(response.data).toBe(response.data);
         expect(axios.post).toHaveBeenCalledWith('URL', {}, {
             headers: {
                 'Accept': 'application/json',

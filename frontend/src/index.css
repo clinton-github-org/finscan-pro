@@ -28,6 +28,8 @@
   padding: 5px 20px;
   position: relative;
   overflow: hidden;
+  max-width: 40em;
+  margin: auto;
 }
 
 .heading_logo:before {
@@ -111,6 +113,10 @@
   min-width: 7em;
 }
 
+#fileUpload {
+  max-width: 20em;
+}
+
 /******** 
     Grid CSS
         ********/
@@ -140,6 +146,11 @@
       max-width: 25em;
       align-self: center;
       justify-self: center;
+    }
+
+    .errorTag {
+      grid-row: 3;
+      grid-column: 2/4;
     }
 
     .loading-container {

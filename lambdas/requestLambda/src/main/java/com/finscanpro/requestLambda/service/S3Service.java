@@ -25,7 +25,7 @@ public class S3Service {
             .region(Region.AP_SOUTH_1)
             .httpClient(UrlConnectionHttpClient.builder().build())
             .build();
-    @Value("${S3_PRESIGNURL_DURATION:10}")
+    @Value("${S3_PRESIGNURL_DURATION}")
     private String duration;
     @Value("${BUCKET_NAME:testBucket}")
     private String bucketName;
