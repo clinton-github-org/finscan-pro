@@ -20,17 +20,17 @@ import java.util.Map;
 @Component
 public class S3Service {
 
-    public static S3Client s3Client = S3Client
-            .builder()
-            .region(Region.AP_SOUTH_1)
-            .httpClient(UrlConnectionHttpClient.builder().build())
-            .build();
-    @Value("${S3_PRESIGNURL_DURATION:10}")
-    private String duration;
-    @Value("${BUCKET_NAME:testBucket}")
-    private String bucketName;
+    public static final S3Client s3Client = S3Client.builder().region(Region.AP_SOUTH_1).httpClient(UrlConnectionHttpClient.builder().build()).build();
 
-    public S3Client getS3Client() {
+    private static String duration;
+    private static String bucketName;
+
+    public S3Service(@Value("${S3_PRESIGNURL_DURATION}") String duration, @Value("${BUCKET_NAME}") String bucketName) {
+        S3Service.duration = duration;
+        S3Service.bucketName = bucketName;
+    }
+
+    public static S3Client getS3Client() {
         if (s3Client != null) {
             return s3Client;
         } else {
@@ -40,21 +40,12 @@ public class S3Service {
 
     public String getS3PreSignedUrl(String keyName, Map<String, String> metadata) {
         try (S3Presigner s3Presigner = S3Presigner.builder().region(Region.AP_SOUTH_1).build()) {
-            PutObjectRequest putObjectRequest = PutObjectRequest
-                    .builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .metadata(metadata)
-                    .build();
 
-            PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest
-                    .builder()
-                    .signatureDuration(Duration.ofMinutes(Integer.parseInt(duration)))
-                    .putObjectRequest(putObjectRequest)
-                    .build();
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).metadata(metadata).build();
 
-            PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner
-                    .presignPutObject(putObjectPresignRequest);
+            PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(Integer.parseInt(duration))).putObjectRequest(putObjectRequest).build();
+
+            PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(putObjectPresignRequest);
 
             return presignedPutObjectRequest.url().toExternalForm();
         } catch (Exception exception) {

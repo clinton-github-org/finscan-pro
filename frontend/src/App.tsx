@@ -4,6 +4,7 @@ import ResultsPage from './components/ResultsPage';
 
 const App = () => {
   const [page, setPage] = useState('home');
+  const [id, setId] = useState('');
 
   return (
     <main className="site">
@@ -12,10 +13,10 @@ const App = () => {
       </header>
 
       <div className="homepage">
-        {page === 'home' && <HomePage setPage={setPage} />}
+        {page === 'home' && <HomePage setPage={setPage} setId={setId}/>}
       </div>
       <div className="resultspage">
-        {page === 'results' && <ResultsPage setPage={setPage} />}
+        {page === 'results' && <ResultsPage setPage={setPage} id={id}/>}
       </div>
     </main>
   );

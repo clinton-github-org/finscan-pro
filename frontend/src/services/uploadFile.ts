@@ -1,18 +1,28 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const uploadFile = async (): Promise<AxiosResponse<any, any>> => {
+interface responseProps {
+    s3URL: string;
+    id: string;
+}
+
+const uploadFile = async (fileName: string): Promise<responseProps> => {
     try {
-        const response = await axios.post('URL', {}, {
-            headers: {
-                'Accept': 'application/json',
-            }
+        const response = await axios.post("http://127.0.0.1:8080/api/v1/request", { fileName }, {
         });
-        return response;
+        if (verifyResponse(response)) {
+            return { s3URL: response['data']['s3URL'], id: response['data']['id'] };
+        } else {
+            throw new Error("Failed to fetch S3 Presigned URL");
+        }
     } catch (error) {
         const axiosError = error as AxiosError;
         throw axiosError.response ? axiosError.response.data : axiosError.message;
     }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const verifyResponse = (response: AxiosResponse<any, any>) => {
+    return response !== undefined && response.status === 200 && !response['data'] && !response['data']['s3URL'] && !response['data']['folderName'];
 }
 
 export default uploadFile;
