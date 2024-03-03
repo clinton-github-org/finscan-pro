@@ -17,7 +17,6 @@
     "fe:lint": "yarn workspace frontend lint",
     "fe:test": "yarn workspace frontend test --verbose",
     "fe:coverage": "yarn workspace frontend coverage",
-    "be:rl:build": "cd lambdas/requestLambda && mvn clean -DBUCKET_NAME=bucketName install",
-    "sam scripts": "sam build && sam local start-api"
+    "be:rl:build": "cd lambdas/requestLambda && mvn clean install"
   }
 }
