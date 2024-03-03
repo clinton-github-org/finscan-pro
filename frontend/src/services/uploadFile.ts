@@ -22,7 +22,7 @@ const uploadFile = async (fileName: string): Promise<responseProps> => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const verifyResponse = (response: AxiosResponse<any, any>) => {
-    return response !== undefined && response.status === 200 && !response['data'] && !response['data']['s3URL'] && !response['data']['id'];
+    return response !== undefined && response.status === 200 && !response['data'] && !response['data']['s3URL'] && !response['data']['folderName'];
 }
 
 export default uploadFile;
