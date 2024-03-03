@@ -5,7 +5,6 @@ interface responseProps {
     id: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const uploadFile = async (fileName: string): Promise<responseProps> => {
     try {
         const response = await axios.post("http://127.0.0.1:8080/api/v1/request", { fileName }, {
