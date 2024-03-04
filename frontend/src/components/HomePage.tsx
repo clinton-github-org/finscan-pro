@@ -57,11 +57,12 @@ const HomePage = ({ setPage, setId }: HomePage) => {
                 type="file"
                 name="fileUpload"
                 id="fileUpload"
-                accept=".pdf"
+                data-testid="fileUpload"
+                accept="application/pdf"
                 onChange={(e) => setFileInput(e)}
               />
             </label>
-            <button type="submit" onClick={(e) => handleSubmit(e)}>
+            <button type="submit" data-testid="fileUploadButton" onClick={(e) => handleSubmit(e)}>
               Submit
             </button>
           </form>
