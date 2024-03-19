@@ -83,7 +83,11 @@ export class InfrastructureStack extends cdk.Stack {
     {
       allowedOrigins: [`http://${distribution.domainName}/`],
       allowedHeaders: ['*'],
-      allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD]
+      allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
+      exposedHeaders: ["Access-Control-Allow-Origin",
+      "ETag"],
+      id: 'CORS_RULE_FOR_DOCUMENTS_UPLOAD_BUCKET',
+      maxAge: 5000
     };
 
     const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
