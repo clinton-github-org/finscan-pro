@@ -1,15 +1,12 @@
 name: Continous Deployment
 
 on:
-  push:
-    branches:
-      - feature/*
-      - main
+  workflow_dispatch:
 
 permissions: write-all
 
 jobs:
-  build-ui:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,22 +25,12 @@ jobs:
       - name: Run FrontEnd Build
         run: yarn fe:build
 
-      - name: Run FrontEnd Tests
+      - name: Run Tests
         run: yarn fe:test
 
       - name: Job was successfully executed! Hurray! 🥳
         if: success()
         run: echo "All steps executed successfully. Infer details from each step for further processing"
-
-  build-requestLambda:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-          cache: 'yarn'
 
       - uses: actions/setup-java@v3
         with:

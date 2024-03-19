@@ -1,7 +1,15 @@
 /** @jest-environment jsdom */
 import '@testing-library/jest-dom';
-import { cleanup, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  fireEvent,
+  act,
+} from '@testing-library/react';
 import App from '../../App';
+
+// const fakeFile = new File(['hello'], 'hello.pdf', { type: 'application/pdf' });
 
 afterEach(() => {
   cleanup();
@@ -49,5 +57,32 @@ describe('renders HomePage when page is home by default', () => {
   it('should not render results page', () => {
     const resultsPage = screen.queryByText('Results Page');
     expect(resultsPage).toBeNull();
+  });
+});
+
+describe('should render results page properly', () => {
+  beforeEach(async () => {
+    render(<App />);
+    await act(async () => {
+      const inputElement = screen.getByTestId('fileUpload');
+      fireEvent.change(inputElement, {
+        target: {
+          files: 'fakeFile',
+        },
+      });
+      const submitElement = screen.getByTestId('fileUploadButton');
+      fireEvent.click(submitElement);
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+    });
+  }, 7000);
+
+  it('should render results page', () => {
+    const resultsTitle = screen.getByTestId('resultsTitle');
+    expect(resultsTitle).toBeInTheDocument();
+  });
+
+  it('should render get results button', () => {
+    const resultsButton = screen.getByText('Get results');
+    expect(resultsButton).toBeInTheDocument();
   });
 });
