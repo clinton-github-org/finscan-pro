@@ -48,8 +48,6 @@ export class InfrastructureStack extends cdk.Stack {
       version: requestLambda.currentVersion,
     });
 
-    bucket.grantReadWrite(requestLambda);
-
     const requestApi: LambdaRestApi = new LambdaRestApi(this, props.staticValues.apiGatewayName, {
       handler: requestLambda,
       binaryMediaTypes: ['*/*'],
@@ -98,6 +96,8 @@ export class InfrastructureStack extends cdk.Stack {
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
       cors: [corsRule]
     });
+
+    documentUploadsBucket.grantReadWrite(requestLambda);
 
     this.outputs = [
       new CfnOutput(this, 'UI_URL', {
