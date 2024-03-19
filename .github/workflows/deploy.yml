@@ -52,7 +52,7 @@ jobs:
           aws-region: ap-south-1
         
       - name: Build and Test CDK
-        run: yarn run cdk:build and test
+        run: yarn run cdk:buildAndTest
 
       - name: Run Synth CDK
         run: yarn run cdk:synth
