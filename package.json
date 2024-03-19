@@ -8,7 +8,8 @@
   "license": "MIT",
   "workspaces": {
     "packages": [
-      "frontend"
+      "frontend",
+      "infrastructure"
     ]
   },
   "scripts": {
@@ -17,6 +18,9 @@
     "fe:lint": "yarn workspace frontend lint",
     "fe:test": "yarn workspace frontend test --verbose",
     "fe:coverage": "yarn workspace frontend coverage",
-    "be:rl:build": "cd lambdas/requestLambda && mvn clean install"
+    "be:rl:build": "cd lambdas/requestLambda && mvn clean install",
+    "cdk:b&t": "yarn workspace infrastructure build & test",
+    "cdk:synth": "yarn workspace infrastructure cdk:synth",
+    "cdk:deploy": "yarn workspace infrastructure cdk:deploy"
   }
 }
