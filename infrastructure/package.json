@@ -8,7 +8,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "build & test": "tsc && jest",
+    "build and test": "tsc && jest",
     "cdk:synth": "cdk synth",
     "cdk:deploy": "cdk deploy --progress events"
   },
