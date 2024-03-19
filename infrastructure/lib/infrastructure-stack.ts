@@ -1,9 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { CloudFrontWebDistribution } from 'aws-cdk-lib/aws-cloudfront';
-import { Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
+import { Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
+import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { Alias, Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
 export interface InfrastructureStackProps {
@@ -13,6 +15,7 @@ export interface InfrastructureStackProps {
   requestLambdaHandler: string;
   requestLambdaPath: string;
   apiGatewayName: string;
+  bucketAssetPath: string;
 }
 
 export class InfrastructureStack extends cdk.Stack {
@@ -28,19 +31,23 @@ export class InfrastructureStack extends cdk.Stack {
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
 
-    const cloudFrontDistribtion = new CloudFrontWebDistribution(this, 'finscan-pro-cfn-distribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: bucket,
-          },
-          behaviors: [
-            {
-              isDefaultBehavior: true
-            }
-          ]
-        }
-      ]
+    const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
+      comment: 'Identity for serving static files'
+    });
+    bucket.grantRead(originAccessIdentity);
+
+    const distribution = new Distribution(this, 'finscan-pro-cfn-distribution', {
+      defaultBehavior: {
+        origin: new S3Origin(bucket)
+      },
+      defaultRootObject: 'index.html'
+    });
+
+    const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
+      destinationBucket: bucket,
+      sources: [Source.asset(props.bucketAssetPath)],
+      distribution,
+      distributionPaths: ['/*']
     });
 
     const requestLambda = new Function(this, props.requestLambdaName, {
@@ -54,6 +61,11 @@ export class InfrastructureStack extends cdk.Stack {
       timeout: Duration.seconds(30)
     });
 
+    const alias = new Alias(this, 'Request-Lambda-ALias', {
+      aliasName: 'Prod',
+      version: requestLambda.currentVersion
+    });
+
     bucket.grantReadWrite(requestLambda);
 
     const requestApi = new LambdaRestApi(this, props.apiGatewayName, {
@@ -61,12 +73,12 @@ export class InfrastructureStack extends cdk.Stack {
       binaryMediaTypes: ['*/*'],
       restApiName: props.apiGatewayName,
       description: "Rest API facing frontend",
-      proxy: true
+      proxy: true,
     });
 
     this.outputs = [
       new CfnOutput(this, 'UI_URL', {
-        value: cloudFrontDistribtion.distributionDomainName
+        value: distribution.domainName
       }),
     ];
   }
