@@ -1,3 +1,10 @@
+import path = require("path");
+
+const requestLambdaName = 'requestLambda';
+const requestLambdaHandler = 'com.finscanpro.requestLambda.RequestLambdaHandler:handleRequest';
+const requestLambdaPath = path.join(__dirname, '..', '..', '/lambdas/requestLambda/target/requestLambda.jar');
+const apiGatewayName = 'finscan-pro-api';
+
 const getAccount = () => {
     if (process.env.CDK_DEFAULT_ACCOUNT) {
         return process.env.CDK_DEFAULT_ACCOUNT;
@@ -22,4 +29,4 @@ const getBucket = () => {
     }
 }
 
-export  { getAccount, getRegion, getBucket };
+export { getAccount, getRegion, getBucket, requestLambdaName, requestLambdaHandler, requestLambdaPath, apiGatewayName };
