@@ -8,7 +8,13 @@ interface uploadFileToS3Props {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const uploadFileToS3 = async ({ s3URL, file }: uploadFileToS3Props): Promise<AxiosResponse<any, any>> => {
     try {
-        const response = await axios.put(s3URL, file);
+        const formData = new FormData();
+        formData.append(file.name, file);
+        const response = await axios.put(s3URL, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
         return response;
     } catch (error) {
         const axiosError = error as AxiosError;
