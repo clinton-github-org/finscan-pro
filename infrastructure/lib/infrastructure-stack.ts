@@ -49,7 +49,7 @@ export class InfrastructureStack extends cdk.Stack {
 
     const alias = new Alias(this, 'Request-Lambda-ALias', {
       aliasName: 'Prod',
-      version: requestLambda.latestVersion,
+      version: requestLambda.currentVersion,
     });
 
     bucket.grantReadWrite(requestLambda);
