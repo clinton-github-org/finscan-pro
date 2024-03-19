@@ -9,6 +9,7 @@ const uploadFile = async (fileName: string): Promise<responseProps> => {
     try {
         const response = await axios.post(`${window.location.href}/api/request`, { fileName }, {
         });
+        console.log(response);
         if (verifyResponse(response)) {
             return { s3URL: response['data']['s3URL'], id: response['data']['id'] };
         } else {
