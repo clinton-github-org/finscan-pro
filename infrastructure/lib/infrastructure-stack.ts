@@ -1,21 +1,17 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
-import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { AllowedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
+import { RestApiOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Alias, Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
-import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, CorsRule, HttpMethods, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
 export interface InfrastructureStackProps {
   env: { account: string; region: string; },
   bucketName: string;
-  requestLambdaName: string;
-  requestLambdaHandler: string;
-  requestLambdaPath: string;
-  apiGatewayName: string;
-  bucketAssetPath: string;
+  staticValues: any
 }
 
 export class InfrastructureStack extends cdk.Stack {
@@ -36,26 +32,12 @@ export class InfrastructureStack extends cdk.Stack {
     });
     bucket.grantRead(originAccessIdentity);
 
-    const distribution = new Distribution(this, 'finscan-pro-cfn-distribution', {
-      defaultBehavior: {
-        origin: new S3Origin(bucket)
-      },
-      defaultRootObject: 'index.html'
-    });
-
-    const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
-      destinationBucket: bucket,
-      sources: [Source.asset(props.bucketAssetPath)],
-      distribution,
-      distributionPaths: ['/*']
-    });
-
-    const requestLambda = new Function(this, props.requestLambdaName, {
-      code: Code.fromAsset(props.requestLambdaPath),
+    const requestLambda = new Function(this, props.staticValues.requestLambdaName, {
+      code: Code.fromAsset(props.staticValues.requestLambdaPath),
       runtime: Runtime.JAVA_17,
-      handler: props.requestLambdaHandler,
+      handler: props.staticValues.requestLambdaHandler,
       snapStart: SnapStartConf.ON_PUBLISHED_VERSIONS,
-      functionName: props.requestLambdaName,
+      functionName: props.staticValues.requestLambdaName,
       description: 'Lambda used to accept requests from frontend',
       memorySize: 500,
       timeout: Duration.seconds(30)
@@ -63,17 +45,58 @@ export class InfrastructureStack extends cdk.Stack {
 
     const alias = new Alias(this, 'Request-Lambda-ALias', {
       aliasName: 'Prod',
-      version: requestLambda.currentVersion
+      version: requestLambda.currentVersion,
     });
 
     bucket.grantReadWrite(requestLambda);
 
-    const requestApi = new LambdaRestApi(this, props.apiGatewayName, {
+    const requestApi: LambdaRestApi = new LambdaRestApi(this, props.staticValues.apiGatewayName, {
       handler: requestLambda,
       binaryMediaTypes: ['*/*'],
-      restApiName: props.apiGatewayName,
+      restApiName: props.staticValues.apiGatewayName,
       description: "Rest API facing frontend",
       proxy: true,
+    });
+
+    const distribution = new Distribution(this, 'finscan-pro-cfn-distribution', {
+      additionalBehaviors: {
+        '/api/*': {
+          origin: new RestApiOrigin(requestApi),
+          allowedMethods: AllowedMethods.ALLOW_ALL
+        }
+      },
+      defaultBehavior: {
+        origin: new S3Origin(bucket),
+        allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
+      },
+      defaultRootObject: 'index.html',
+    });
+
+    const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
+      destinationBucket: bucket,
+      sources: [Source.asset(props.staticValues.bucketAssetPath)],
+      distribution,
+      distributionPaths: ['/*'],
+    });
+
+    const corsRule: CorsRule =
+    {
+      allowedOrigins: [`http://${distribution.domainName}*`],
+      allowedHeaders: ['*'],
+      allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
+      exposedHeaders: ["Access-Control-Allow-Origin",
+      "ETag"],
+      id: 'CORS_RULE_FOR_DOCUMENTS_UPLOAD_BUCKET',
+      maxAge: 5000
+    };
+
+    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
+      bucketName: props.staticValues.documentUploadsBucket,
+      publicReadAccess: false,
+      blockPublicAccess: this.getPublicBlockAccess(),
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
+      cors: [corsRule]
     });
 
     this.outputs = [

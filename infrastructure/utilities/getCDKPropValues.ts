@@ -1,10 +1,14 @@
 import path = require("path");
 
-const requestLambdaName = 'requestLambda';
-const requestLambdaHandler = 'com.finscanpro.requestLambda.RequestLambdaHandler:handleRequest';
-const requestLambdaPath = path.join(__dirname, '..', '..', '/lambdas/requestLambda/target/requestLambda.jar');
-const apiGatewayName = 'finscan-pro-api';
-const bucketAssetPath = path.join(__dirname, '..', '..', '/frontend/dist')
+const staticValues = {
+    requestLambdaName: 'requestLambda',
+    requestLambdaHandler: 'com.finscanpro.requestLambda.RequestLambdaHandler::handleRequest',
+    requestLambdaPath: path.join(__dirname, '..', '..', '/lambdas/requestLambda/target/requestLambda.jar'),
+    apiGatewayName: 'finscan-pro-api',
+    bucketAssetPath: path.join(__dirname, '..', '..', '/frontend/dist'),
+    documentUploadsBucket: 'documents-uploads-bucket-fcp'
+}
+
 const getAccount = () => {
     if (process.env.CDK_DEFAULT_ACCOUNT) {
         return process.env.CDK_DEFAULT_ACCOUNT;
@@ -29,4 +33,4 @@ const getBucket = () => {
     }
 }
 
-export { getAccount, getRegion, getBucket, requestLambdaName, requestLambdaHandler, requestLambdaPath, apiGatewayName, bucketAssetPath };
+export { getAccount, getBucket, getRegion, staticValues };
