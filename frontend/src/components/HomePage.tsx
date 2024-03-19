@@ -21,13 +21,15 @@ const HomePage = ({ setPage, setId }: HomePage) => {
       setIsError(false);
       try {
         const {s3URL, id} = await uploadFile(file.name);
-        await new Promise((resolve) => setTimeout(resolve, 5000));
         setId(id);
+        console.log("Going to upload");
         const response = await uploadFileToS3({ s3URL, file });
+        console.log("Upload complete");
         if (response.status === 200) {
           setPage('results');
         }
       } catch (error) {
+        console.log(error);
         setIsError(true);
       } finally {
         setIsLoading(false);
