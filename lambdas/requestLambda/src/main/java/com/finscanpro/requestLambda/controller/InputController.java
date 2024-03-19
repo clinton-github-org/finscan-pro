@@ -18,13 +18,13 @@ import java.util.UUID;
  * @author Clinton Fernandes
  */
 @RestController
-@RequestMapping(value = "/api/v1/")
+@RequestMapping(value = "/api")
 public class InputController {
 
     @Autowired
     private S3Service s3Service;
 
-    @PostMapping(value = "request", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> processNewRequest(@RequestBody String fileName) {
         Map<String, Object> body = new HashMap<>();
         Map<String, String> metadata = new HashMap<>();
