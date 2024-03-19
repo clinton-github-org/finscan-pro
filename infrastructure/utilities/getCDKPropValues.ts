@@ -1,7 +1,7 @@
 import path = require("path");
 
 const requestLambdaName = 'requestLambda';
-const requestLambdaHandler = 'com.finscanpro.requestLambda.RequestLambdaHandler:handleRequest';
+const requestLambdaHandler = 'com.finscanpro.requestLambda.RequestLambdaHandler';
 const requestLambdaPath = path.join(__dirname, '..', '..', '/lambdas/requestLambda/target/requestLambda.jar');
 const apiGatewayName = 'finscan-pro-api';
 const bucketAssetPath = path.join(__dirname, '..', '..', '/frontend/dist')
