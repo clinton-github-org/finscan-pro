@@ -33,6 +33,7 @@ export class InfrastructureStack extends cdk.Stack {
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
+      cors: [this.getCorsRule()]
     });
 
     const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
@@ -87,19 +88,6 @@ export class InfrastructureStack extends cdk.Stack {
       distributionPaths: ['/*'],
     });
 
-    const corsRule: CorsRule =
-    {
-      allowedOrigins: [`http://${distribution.domainName}*`],
-      allowedHeaders: ['*'],
-      allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
-      exposedHeaders: ["Access-Control-Allow-Origin",
-      "ETag"],
-      id: 'CORS_RULE_FOR_DOCUMENTS_UPLOAD_BUCKET',
-      maxAge: 5000
-    };
-
-    documentUploadsBucket.addCorsRule(corsRule);
-
     this.outputs = [
       new CfnOutput(this, 'UI_URL', {
         value: distribution.domainName
@@ -115,5 +103,18 @@ export class InfrastructureStack extends cdk.Stack {
       restrictPublicBuckets: true
     });
     return publicAccess;
+  }
+
+  private getCorsRule(): CorsRule {
+    return (
+      {
+        allowedOrigins: [`*`],
+        allowedHeaders: ['*'],
+        allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
+        exposedHeaders: ["Access-Control-Allow-Origin",
+          "ETag"],
+        maxAge: 3000
+      }
+    );
   }
 }
