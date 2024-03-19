@@ -1,4 +1,4 @@
-name: Continous Deployment
+name: Deploy Stack to AWS
 
 on:
   workflow_dispatch:
@@ -8,6 +8,14 @@ permissions: write-all
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env: 
+      CDK_DEFAULT_ACCOUNT: ${{ secrets.CDK_DEFAULT_ACCOUNT }}
+      CDK_DEFAULT_REGION: ${{ secrets.CDK_DEFAULT_REGION }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+
+    outputs:
+      UI_URL: ${{ steps.get-outputs.outputs.UI_URL }}
+
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js 18.x
@@ -40,3 +48,18 @@ jobs:
 
       - name: Build and Test Request Lambda
         run: yarn be:rl:build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_GITHUB_AWS_ROLE }}
+          aws-region: ap-south-1
+        
+      - name: Build and Test CDK
+        run: yarn run build && yarn run test
+
+      - name: Run Synth CDK
+        run: yarn run cdk:synth
+
+      - name: Deploy Stack
+        run: yarn run cdk:deploy
