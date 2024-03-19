@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-commented-out-tests */
 /** @jest-environment jsdom */
 import '@testing-library/jest-dom';
 import {
@@ -60,6 +59,7 @@ describe('renders HomePage when page is home by default', () => {
 });
 
 
+// eslint-disable-next-line jest/no-commented-out-tests
 // describe('should render results page properly', () => {
 //   beforeEach(async () => {
 //     render(<App />);
@@ -76,11 +76,13 @@ describe('renders HomePage when page is home by default', () => {
 //     });
 //   }, 7000);
 
+// eslint-disable-next-line jest/no-commented-out-tests
 //   it('should render results page', () => {
 //     const resultsTitle = screen.getByTestId('resultsTitle');
 //     expect(resultsTitle).toBeInTheDocument();
 //   });
 
+// eslint-disable-next-line jest/no-commented-out-tests
 //   it('should render get results button', () => {
 //     const resultsButton = screen.getByText('Get results');
 //     expect(resultsButton).toBeInTheDocument();
