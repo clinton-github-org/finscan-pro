@@ -65,15 +65,9 @@ export class InfrastructureStack extends cdk.Stack {
     });
 
     this.outputs = [
-      new CfnOutput(this, 'BUCKET_NAME', {
-        value: bucket.bucketName
-      }),
       new CfnOutput(this, 'UI_URL', {
         value: cloudFrontDistribtion.distributionDomainName
       }),
-      new CfnOutput(this, 'LAMBDA', {
-        value: requestLambda.functionName
-      })
     ];
   }
 
