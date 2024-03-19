@@ -12,7 +12,7 @@ const uploadFileToS3 = async ( {s3URL, file}: uploadFileToS3Props ): Promise<Axi
         data: file
        }, {
         headers: {
-            'Content-Type': 'application/octet-stream'
+            'Content-Type': 'application/pdf'
           }
        });
        return response;

@@ -81,7 +81,7 @@ export class InfrastructureStack extends cdk.Stack {
 
     const corsRule: CorsRule =
     {
-      allowedOrigins: [`http://${distribution.domainName}/`],
+      allowedOrigins: [`http://${distribution.domainName}*`],
       allowedHeaders: ['*'],
       allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
       exposedHeaders: ["Access-Control-Allow-Origin",
