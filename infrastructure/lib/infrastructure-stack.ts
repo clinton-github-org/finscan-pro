@@ -27,6 +27,14 @@ export class InfrastructureStack extends cdk.Stack {
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
 
+    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
+      bucketName: props.staticValues.documentUploadsBucket,
+      publicReadAccess: false,
+      blockPublicAccess: this.getPublicBlockAccess(),
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
+    });
+
     const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
       comment: 'Identity for serving static files'
     });
@@ -42,6 +50,8 @@ export class InfrastructureStack extends cdk.Stack {
       memorySize: 500,
       timeout: Duration.seconds(30)
     });
+
+    documentUploadsBucket.grantReadWrite(requestLambda);
 
     const alias = new Alias(this, 'Request-Lambda-ALias', {
       aliasName: 'Prod',
@@ -88,16 +98,7 @@ export class InfrastructureStack extends cdk.Stack {
       maxAge: 5000
     };
 
-    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
-      bucketName: props.staticValues.documentUploadsBucket,
-      publicReadAccess: false,
-      blockPublicAccess: this.getPublicBlockAccess(),
-      encryption: BucketEncryption.S3_MANAGED,
-      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-      cors: [corsRule]
-    });
-
-    documentUploadsBucket.grantReadWrite(requestLambda);
+    documentUploadsBucket.addCorsRule(corsRule);
 
     this.outputs = [
       new CfnOutput(this, 'UI_URL', {
