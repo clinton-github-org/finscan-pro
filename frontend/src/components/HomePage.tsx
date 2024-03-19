@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from 'react';
-// import uploadFileToS3 from '../services/s3Service';
-// import uploadFile from '../services/uploadFile';
+import uploadFileToS3 from '../services/s3Service';
+import uploadFile from '../services/uploadFile';
 
 interface HomePage {
   setPage: Dispatch<SetStateAction<string>>;
@@ -20,14 +20,13 @@ const HomePage = ({ setPage, setId }: HomePage) => {
     if (file !== undefined) {
       setIsError(false);
       try {
-        // const {s3URL, id} = await uploadFile(file.name);
+        const {s3URL, id} = await uploadFile(file.name);
         await new Promise((resolve) => setTimeout(resolve, 5000));
-        const id = "1234";
         setId(id);
-        // const response = await uploadFileToS3({ s3URL, file });
-        // if (response.status === 200) {
+        const response = await uploadFileToS3({ s3URL, file });
+        if (response.status === 200) {
           setPage('results');
-        // }
+        }
       } catch (error) {
         setIsError(true);
       } finally {

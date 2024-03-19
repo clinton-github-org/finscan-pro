@@ -7,7 +7,7 @@ interface responseProps {
 
 const uploadFile = async (fileName: string): Promise<responseProps> => {
     try {
-        const response = await axios.post("http://127.0.0.1:8080/api/v1/request", { fileName }, {
+        const response = await axios.post(`${window.location.href}/api/request`, { fileName }, {
         });
         if (verifyResponse(response)) {
             return { s3URL: response['data']['s3URL'], id: response['data']['id'] };
