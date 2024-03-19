@@ -22,9 +22,7 @@ const HomePage = ({ setPage, setId }: HomePage) => {
       try {
         const {s3URL, id} = await uploadFile(file.name);
         setId(id);
-        console.log("Going to upload");
         const response = await uploadFileToS3({ s3URL, file });
-        console.log("Upload complete");
         if (response.status === 200) {
           setPage('results');
         }
