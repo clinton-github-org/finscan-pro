@@ -1,9 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { CloudFrontWebDistribution } from 'aws-cdk-lib/aws-cloudfront';
+import { CloudFrontWebDistribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
 export interface InfrastructureStackProps {
@@ -13,6 +14,7 @@ export interface InfrastructureStackProps {
   requestLambdaHandler: string;
   requestLambdaPath: string;
   apiGatewayName: string;
+  bucketAssetPath: string;
 }
 
 export class InfrastructureStack extends cdk.Stack {
@@ -28,17 +30,46 @@ export class InfrastructureStack extends cdk.Stack {
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
 
+    const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
+      destinationBucket: bucket,
+      sources: [Source.asset(props.bucketAssetPath)],
+    });
+
+    const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
+      comment: 'Identity for serving static files'
+    });
+    bucket.grantRead(originAccessIdentity);
+
     const cloudFrontDistribtion = new CloudFrontWebDistribution(this, 'finscan-pro-cfn-distribution', {
+      defaultRootObject: 'index.html',
       originConfigs: [
         {
           s3OriginSource: {
             s3BucketSource: bucket,
+            originAccessIdentity,
           },
           behaviors: [
             {
               isDefaultBehavior: true
             }
           ]
+        }
+      ],
+      errorConfigurations: [
+        {
+          errorCode: 403,
+          responseCode: 200,
+          responsePagePath: '/index.html'
+        },
+        {
+          errorCode: 404,
+          responseCode: 200,
+          responsePagePath: '/index.html'
+        },
+        {
+          errorCode: 500,
+          responseCode: 200,
+          responsePagePath: '/index.html'
         }
       ]
     });

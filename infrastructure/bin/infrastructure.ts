@@ -2,7 +2,7 @@
 import * as cdk from 'aws-cdk-lib';
 import 'source-map-support/register';
 import { InfrastructureStack } from '../lib/infrastructure-stack';
-import { apiGatewayName, getAccount, getBucket, getRegion, requestLambdaHandler, requestLambdaName, requestLambdaPath } from '../utilities/getCDKPropValues';
+import { apiGatewayName, bucketAssetPath, getAccount, getBucket, getRegion, requestLambdaHandler, requestLambdaName, requestLambdaPath } from '../utilities/getCDKPropValues';
 
 const app = new cdk.App();
 new InfrastructureStack(app, 'InfrastructureStack', {
@@ -11,5 +11,6 @@ new InfrastructureStack(app, 'InfrastructureStack', {
   requestLambdaName,
   requestLambdaHandler,
   requestLambdaPath,
-  apiGatewayName
+  apiGatewayName,
+  bucketAssetPath
 });
