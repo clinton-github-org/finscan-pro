@@ -51,7 +51,7 @@ jobs:
           role-to-assume: ${{ secrets.OIDC_GITHUB_AWS_ROLE }}
           aws-region: ap-south-1
         
-      - name: Build and Test CDK
+      - name: Build CDK
         run: yarn run cdk:build
 
       - name: Run Synth CDK
