@@ -5,9 +5,12 @@ interface responseProps {
     id: string;
 }
 
-const uploadFile = async (fileName: string): Promise<responseProps> => {
+const uploadFile = async (fileName: string, contentType: string): Promise<responseProps> => {
     try {
-        const response = await axios.post(`${window.location.href}/api/request`, { fileName }, {
+        const response = await axios({
+            url: `${window.location.href}/api/request`,
+            data: {fileName, contentType},
+            method: 'post'
         });
         if (verifyResponse(response)) {
             return { s3URL: response.data.s3URL, id: response.data.folderName };

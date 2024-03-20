@@ -5,7 +5,7 @@ import { InfrastructureStack } from '../lib/infrastructure-stack';
 import { getAccount, getBucket, getRegion, staticValues } from '../utilities/getCDKPropValues';
 
 const app = new cdk.App();
-new InfrastructureStack(app, 'InfrastructureStack', {
+const infrastructureStack = new InfrastructureStack(app, 'InfrastructureStack', {
   env: { account: getAccount(), region: getRegion() },
   bucketName: getBucket(),
   staticValues

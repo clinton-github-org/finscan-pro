@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "cdk:synth": "cdk synth",
-    "cdk:deploy": "cdk deploy --progress events --verbose"
+    "cdk:deploy": "cdk deploy --progress events --verbose",
+    "cdk:destroy": "cdk destroy InfrastructureStack"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

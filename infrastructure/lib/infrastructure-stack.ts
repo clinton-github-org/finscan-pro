@@ -1,20 +1,19 @@
-import * as cdk from 'aws-cdk-lib';
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { AllowedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
+import { AllowedMethods, CachedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { RestApiOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Alias, Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket, BucketEncryption, CorsRule, HttpMethods, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
-export interface InfrastructureStackProps {
+export interface InfrastructureStackProps extends StackProps {
   env: { account: string; region: string; },
   bucketName: string;
   staticValues: any
 }
 
-export class InfrastructureStack extends cdk.Stack {
+export class InfrastructureStack extends Stack {
   readonly outputs: Array<CfnOutput>;
   constructor(scope: Construct, id: string, props: InfrastructureStackProps) {
     super(scope, id, props);
@@ -24,6 +23,8 @@ export class InfrastructureStack extends cdk.Stack {
       publicReadAccess: false,
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
 
@@ -48,7 +49,23 @@ export class InfrastructureStack extends cdk.Stack {
       version: requestLambda.currentVersion,
     });
 
-    bucket.grantReadWrite(requestLambda);
+    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
+      bucketName: props.staticValues.documentUploadsBucket,
+      publicReadAccess: false,
+      blockPublicAccess: this.getPublicBlockAccess(),
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      lifecycleRules: [
+        {
+          expiration: Duration.days(1),
+          enabled: true
+        }
+      ],
+      cors: [this.getCorsRule()]
+    });
+    documentUploadsBucket.grantReadWrite(requestLambda);
 
     const requestApi: LambdaRestApi = new LambdaRestApi(this, props.staticValues.apiGatewayName, {
       handler: requestLambda,
@@ -68,6 +85,7 @@ export class InfrastructureStack extends cdk.Stack {
       defaultBehavior: {
         origin: new S3Origin(bucket),
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
+        cachedMethods: CachedMethods.CACHE_GET_HEAD,
       },
       defaultRootObject: 'index.html',
     });
@@ -77,26 +95,6 @@ export class InfrastructureStack extends cdk.Stack {
       sources: [Source.asset(props.staticValues.bucketAssetPath)],
       distribution,
       distributionPaths: ['/*'],
-    });
-
-    const corsRule: CorsRule =
-    {
-      allowedOrigins: [`http://${distribution.domainName}*`],
-      allowedHeaders: ['*'],
-      allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
-      exposedHeaders: ["Access-Control-Allow-Origin",
-      "ETag"],
-      id: 'CORS_RULE_FOR_DOCUMENTS_UPLOAD_BUCKET',
-      maxAge: 5000
-    };
-
-    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
-      bucketName: props.staticValues.documentUploadsBucket,
-      publicReadAccess: false,
-      blockPublicAccess: this.getPublicBlockAccess(),
-      encryption: BucketEncryption.S3_MANAGED,
-      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-      cors: [corsRule]
     });
 
     this.outputs = [
@@ -114,5 +112,18 @@ export class InfrastructureStack extends cdk.Stack {
       restrictPublicBuckets: true
     });
     return publicAccess;
+  }
+
+  private getCorsRule(): CorsRule {
+    return (
+      {
+        allowedOrigins: [`*`],
+        allowedHeaders: [`*`],
+        allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
+        exposedHeaders: ["Access-Control-Allow-Origin",
+          "ETag"],
+        maxAge: 600
+      }
+    );
   }
 }
