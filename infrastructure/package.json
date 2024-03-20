@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "cdk:synth": "cdk synth",
     "cdk:deploy": "cdk deploy --progress events --verbose",
-    "cdk:destroy": "cdk destroy InfrastructureStack"
+    "cdk:destroy": "cdk destroy InfrastructureStack --force"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
