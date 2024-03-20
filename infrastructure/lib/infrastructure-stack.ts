@@ -70,23 +70,26 @@ export class InfrastructureStack extends cdk.Stack {
       defaultRootObject: 'index.html',
     });
 
-    // const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
-    //   bucketName: props.staticValues.documentUploadsBucket,
-    //   publicReadAccess: false,
-    //   blockPublicAccess: this.getPublicBlockAccess(),
-    //   encryption: BucketEncryption.S3_MANAGED,
-    //   objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
-    //   autoDeleteObjects: true,
-    //   lifecycleRules: [
-    //     {
-    //       expiration: Duration.days(1),
-    //       enabled: true
-    //     }
-    //   ],
-    //   cors: [this.getCorsRule(distribution.domainName)]
-    // });
-    // documentUploadsBucket.grantReadWrite(requestLambda);
+    const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
+      bucketName: props.staticValues.documentUploadsBucket,
+      publicReadAccess: false,
+      blockPublicAccess: this.getPublicBlockAccess(),
+      encryption: BucketEncryption.S3_MANAGED,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      lifecycleRules: [
+        {
+          expiration: Duration.days(1),
+          enabled: true
+        }
+      ],
+      cors: [this.getCorsRule(distribution.domainName)]
+    });
+    documentUploadsBucket.node.addDependency(distribution);
+    documentUploadsBucket.node.addDependency(requestLambda);
+
+    documentUploadsBucket.grantReadWrite(requestLambda);
 
     const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
       destinationBucket: bucket,
