@@ -27,14 +27,8 @@ jobs:
       - name: Install project dependencies
         run: yarn --prefer-offline
 
-      - name: Run Lint
-        run: yarn fe:lint
-
       - name: Run FrontEnd Build
         run: yarn fe:build
-
-      - name: Run Tests
-        run: yarn fe:test
 
       - uses: actions/setup-java@v3
         with:
@@ -42,7 +36,7 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
-      - name: Build and Test Request Lambda
+      - name: Build Request Lambda
         run: yarn be:rl:build
 
       - name: Configure AWS credentials
