@@ -54,10 +54,10 @@ public class S3Service {
         }
     }
 
-    public String getS3PreSignedUrl(String keyName, Map<String, String> metadata) {
+    public String getS3PreSignedUrl(String keyName, Map<String, String> metadata, String contentType) {
         try (S3Presigner s3Presigner = S3Presigner.builder().region(Region.AP_SOUTH_1).credentialsProvider(DefaultCredentialsProvider.create()).build()) {
 
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).metadata(metadata).build();
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).contentType(contentType).metadata(metadata).build();
 
             PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(Integer.parseInt(duration))).putObjectRequest(putObjectRequest).build();
 

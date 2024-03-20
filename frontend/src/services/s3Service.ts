@@ -10,7 +10,7 @@ const uploadFileToS3 = async ({ s3URL, file }: uploadFileToS3Props): Promise<Axi
     try {
         const response = await axios.put(s3URL, file, {
             headers: {
-                "Content-Type": "application/octet-stream"
+                "Content-Type": "application/pdf"
             }
         });
         return response;
