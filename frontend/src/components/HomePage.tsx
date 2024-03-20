@@ -10,7 +10,7 @@ interface HomePage {
 const HomePage = ({ setPage, setId }: HomePage) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | undefined>(undefined);
 
   // File Upload
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +20,7 @@ const HomePage = ({ setPage, setId }: HomePage) => {
     if (file !== undefined) {
       setIsError(false);
       try {
-        const {s3URL, id} = await uploadFile(file.name);
+        const {s3URL, id} = await uploadFile(file.name, file.type);
         setId(id);
         const response = await uploadFileToS3({ s3URL, file });
         if (response.status === 200) {
@@ -40,6 +40,7 @@ const HomePage = ({ setPage, setId }: HomePage) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setFileInput = (e: any): void => {
+    e.preventDefault();
     setFile(e.target.files[0]);
   };
 

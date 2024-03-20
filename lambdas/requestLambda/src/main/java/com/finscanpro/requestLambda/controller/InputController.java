@@ -32,6 +32,7 @@ public class InputController {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode requestJson = mapper.readTree(requestBody);
         String fileName = requestJson.get("fileName").textValue();
+        String contentType = requestJson.get("contentType").textValue();
         Map<String, Object> body = new HashMap<>();
         Map<String, String> metadata = new HashMap<>();
         UUID uuid = UUID.randomUUID();
@@ -39,7 +40,7 @@ public class InputController {
         metadata.put("File name", fileName);
         String keyName = uuid.toString().concat("/").concat(fileName);
         s3Service.putS3Object(keyName);
-        String url = s3Service.getS3PreSignedUrl(keyName, metadata, "application/pdf");
+        String url = s3Service.getS3PreSignedUrl(keyName, metadata, contentType);
         body.put("s3URL", url);
         body.put("folderName", uuid);
 

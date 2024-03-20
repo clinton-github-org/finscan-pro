@@ -33,7 +33,7 @@ public class InputControllerTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testProcessNewRequest() throws JsonProcessingException {
-        String requestBody = "{\"fileName\":\"dummy.pdf\"}";
+        String requestBody = "{\"fileName\":\"dummy.pdf\", \"contentType\": \"application/pdf\"}";
         String expectedUrl = "http://example.com/presigned-url";
 
         when(s3Service.getS3PreSignedUrl(anyString(), anyMap(), anyString())).thenReturn(expectedUrl);
