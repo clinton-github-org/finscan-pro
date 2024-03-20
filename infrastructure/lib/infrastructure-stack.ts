@@ -33,7 +33,6 @@ export class InfrastructureStack extends cdk.Stack {
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-      cors: [this.getCorsRule()],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       lifecycleRules: [
@@ -89,6 +88,8 @@ export class InfrastructureStack extends cdk.Stack {
       defaultRootObject: 'index.html',
     });
 
+    documentUploadsBucket.addCorsRule(this.getCorsRule(distribution.domainName));
+
     const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
       destinationBucket: bucket,
       sources: [Source.asset(props.staticValues.bucketAssetPath)],
@@ -113,11 +114,11 @@ export class InfrastructureStack extends cdk.Stack {
     return publicAccess;
   }
 
-  private getCorsRule(): CorsRule {
+  private getCorsRule(distributionName: string): CorsRule {
     return (
       {
         allowedOrigins: [`*`],
-        allowedHeaders: ['*'],
+        allowedHeaders: [`${distributionName}*`],
         allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
         exposedHeaders: ["Access-Control-Allow-Origin",
           "ETag"],
