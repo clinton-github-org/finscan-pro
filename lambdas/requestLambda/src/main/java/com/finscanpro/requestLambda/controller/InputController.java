@@ -32,7 +32,7 @@ public class InputController {
 
         metadata.put("File name", fileName);
         String keyName = uuid.toString().concat("/").concat(fileName);
-        S3Service.putS3Object(keyName);
+        s3Service.putS3Object(keyName);
         String url = s3Service.getS3PreSignedUrl(keyName, metadata, "application/pdf");
         body.put("s3URL", url);
         body.put("folderName", uuid);

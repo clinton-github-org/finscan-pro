@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 /**
@@ -34,7 +35,8 @@ public class InputControllerTest {
         String fileName = "example.pdf";
         String expectedUrl = "http://example.com/presigned-url";
 
-        when(s3Service.getS3PreSignedUrl(anyString(), anyMap())).thenReturn(expectedUrl);
+        when(s3Service.getS3PreSignedUrl(anyString(), anyMap(), anyString())).thenReturn(expectedUrl);
+        doNothing().when(s3Service).putS3Object(anyString());
 
         ResponseEntity<Object> response = inputController.processNewRequest(fileName);
 

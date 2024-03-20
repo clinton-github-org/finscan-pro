@@ -34,7 +34,7 @@ public class S3Service {
         S3Service.bucketName = bucketName;
     }
 
-    public static void putS3Object(String keyName) {
+    public void putS3Object(String keyName) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
