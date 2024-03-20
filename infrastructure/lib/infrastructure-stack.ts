@@ -33,7 +33,15 @@ export class InfrastructureStack extends cdk.Stack {
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-      cors: [this.getCorsRule()]
+      cors: [this.getCorsRule()],
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      lifecycleRules: [
+        {
+          expiration: Duration.days(1),
+          enabled: true
+        }
+      ]
     });
 
     const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
