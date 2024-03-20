@@ -1,5 +1,4 @@
-import * as cdk from 'aws-cdk-lib';
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AllowedMethods, CachedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { RestApiOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -8,13 +7,13 @@ import { BlockPublicAccess, Bucket, BucketEncryption, CorsRule, HttpMethods, Obj
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 
-export interface InfrastructureStackProps {
+export interface InfrastructureStackProps extends StackProps {
   env: { account: string; region: string; },
   bucketName: string;
   staticValues: any
 }
 
-export class InfrastructureStack extends cdk.Stack {
+export class InfrastructureStack extends Stack {
   readonly outputs: Array<CfnOutput>;
   constructor(scope: Construct, id: string, props: InfrastructureStackProps) {
     super(scope, id, props);
@@ -24,7 +23,7 @@ export class InfrastructureStack extends cdk.Stack {
       publicReadAccess: false,
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
@@ -56,7 +55,7 @@ export class InfrastructureStack extends cdk.Stack {
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       lifecycleRules: [
         {
