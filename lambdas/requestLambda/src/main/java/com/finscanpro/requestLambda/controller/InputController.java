@@ -1,5 +1,8 @@
 package com.finscanpro.requestLambda.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finscanpro.requestLambda.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +28,10 @@ public class InputController {
     private S3Service s3Service;
 
     @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> processNewRequest(@RequestBody String fileName) {
+    public ResponseEntity<Object> processNewRequest(@RequestBody String requestBody) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode requestJson = mapper.readTree(requestBody);
+        String fileName = String.valueOf(requestJson.get("fileName"));
         Map<String, Object> body = new HashMap<>();
         Map<String, String> metadata = new HashMap<>();
         UUID uuid = UUID.randomUUID();
