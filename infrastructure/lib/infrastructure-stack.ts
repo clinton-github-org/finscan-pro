@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { AllowedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
+import { AllowedMethods, CachedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { RestApiOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Alias, Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket, BucketEncryption, CorsRule, HttpMethods, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
@@ -24,6 +24,8 @@ export class InfrastructureStack extends cdk.Stack {
       publicReadAccess: false,
       blockPublicAccess: this.getPublicBlockAccess(),
       encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
 
@@ -84,6 +86,7 @@ export class InfrastructureStack extends cdk.Stack {
       defaultBehavior: {
         origin: new S3Origin(bucket),
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
+        cachedMethods: CachedMethods.CACHE_GET_HEAD,
       },
       defaultRootObject: 'index.html',
     });
@@ -120,7 +123,7 @@ export class InfrastructureStack extends cdk.Stack {
         allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
         exposedHeaders: ["Access-Control-Allow-Origin",
           "ETag"],
-        maxAge: 3000
+        maxAge: 600
       }
     );
   }
