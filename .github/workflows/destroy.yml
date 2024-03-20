@@ -1,4 +1,4 @@
-name: Deploy Stack to AWS
+name: Destroy Stack on AWS
 
 on:
   workflow_dispatch:
