@@ -1,21 +1,23 @@
 import * as cdk from 'aws-cdk-lib';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { AllowedMethods, Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
-import { RestApiOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { Alias, Code, Function, Runtime, SnapStartConf } from 'aws-cdk-lib/aws-lambda';
-import { BlockPublicAccess, Bucket, BucketEncryption, CorsRule, HttpMethods, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
-export interface InfrastructureStackProps {
+export interface InfrastructureStackProps extends cdk.StackProps {
   env: { account: string; region: string; },
   bucketName: string;
-  staticValues: any
+  staticValues: any;
 }
 
 export class InfrastructureStack extends cdk.Stack {
   readonly outputs: Array<CfnOutput>;
+  readonly bucket: Bucket;
+  readonly requestApi: LambdaRestApi;
+  readonly documentUploadsBucket: Bucket;
+
   constructor(scope: Construct, id: string, props: InfrastructureStackProps) {
     super(scope, id, props);
 
@@ -26,6 +28,8 @@ export class InfrastructureStack extends cdk.Stack {
       encryption: BucketEncryption.S3_MANAGED,
       objectOwnership: ObjectOwnership.BUCKET_OWNER_PREFERRED
     });
+
+    this.bucket = bucket;
 
     const documentUploadsBucket: Bucket = new Bucket(this, props.staticValues.documentUploadsBucket, {
       bucketName: props.staticValues.documentUploadsBucket,
@@ -42,6 +46,8 @@ export class InfrastructureStack extends cdk.Stack {
         }
       ]
     });
+
+    this.documentUploadsBucket = documentUploadsBucket;
 
     const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity', {
       comment: 'Identity for serving static files'
@@ -74,34 +80,7 @@ export class InfrastructureStack extends cdk.Stack {
       proxy: true,
     });
 
-    const distribution = new Distribution(this, 'finscan-pro-cfn-distribution', {
-      additionalBehaviors: {
-        '/api/*': {
-          origin: new RestApiOrigin(requestApi),
-          allowedMethods: AllowedMethods.ALLOW_ALL
-        }
-      },
-      defaultBehavior: {
-        origin: new S3Origin(bucket),
-        allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
-      },
-      defaultRootObject: 'index.html',
-    });
-
-    documentUploadsBucket.addCorsRule(this.getCorsRule(distribution.domainName));
-
-    const bucketDeployment: BucketDeployment = new BucketDeployment(this, 'Finscan-Pro-Bucket-Deployment', {
-      destinationBucket: bucket,
-      sources: [Source.asset(props.staticValues.bucketAssetPath)],
-      distribution,
-      distributionPaths: ['/*'],
-    });
-
-    this.outputs = [
-      new CfnOutput(this, 'UI_URL', {
-        value: distribution.domainName
-      }),
-    ];
+    this.requestApi = requestApi;
   }
 
   private getPublicBlockAccess(): BlockPublicAccess {
@@ -112,18 +91,5 @@ export class InfrastructureStack extends cdk.Stack {
       restrictPublicBuckets: true
     });
     return publicAccess;
-  }
-
-  private getCorsRule(distributionName: string): CorsRule {
-    return (
-      {
-        allowedOrigins: [`*`],
-        allowedHeaders: [`${distributionName}*`],
-        allowedMethods: [HttpMethods.PUT, HttpMethods.POST, HttpMethods.DELETE, HttpMethods.GET, HttpMethods.HEAD],
-        exposedHeaders: ["Access-Control-Allow-Origin",
-          "ETag"],
-        maxAge: 3000
-      }
-    );
   }
 }
