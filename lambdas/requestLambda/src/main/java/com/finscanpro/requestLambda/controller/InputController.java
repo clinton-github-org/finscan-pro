@@ -31,6 +31,7 @@ public class InputController {
         UUID uuid = UUID.randomUUID();
 
         metadata.put("File name", fileName);
+        S3Service.putS3Object(uuid.toString());
         String url = s3Service.getS3PreSignedUrl(uuid + "/" + fileName, metadata);
         body.put("s3URL", url);
         body.put("folderName", uuid);
