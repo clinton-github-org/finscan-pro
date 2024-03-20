@@ -21,6 +21,7 @@
     "be:rl:build": "cd lambdas/requestLambda && mvn clean install",
     "cdk:build": "yarn workspace infrastructure build",
     "cdk:synth": "yarn workspace infrastructure cdk:synth",
-    "cdk:deploy": "yarn workspace infrastructure cdk:deploy"
+    "cdk:deploy": "yarn workspace infrastructure cdk:deploy",
+    "cdk:destroy": "yarn workspace infrastructure cdk:destroy"
   }
 }
