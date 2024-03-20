@@ -11,8 +11,7 @@ const uploadFileToS3 = async ({ s3URL, file }: uploadFileToS3Props): Promise<Axi
         const response = await axios({
             url: s3URL,
             data: file,
-            headers: { "Content-Type" : file.type },
-            method: 'post'
+            method: 'put'
         });
         return response;
     } catch (error) {

@@ -16,7 +16,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
-import java.util.Map;
 
 /**
  * @author Clinton Fernandes
@@ -34,6 +33,14 @@ public class S3Service {
         S3Service.bucketName = bucketName;
     }
 
+    public static S3Client getS3Client() {
+        if (s3Client != null) {
+            return s3Client;
+        } else {
+            throw new S3ServiceException("Failed to retrieve S3 client!", new Exception("S3 Client error"));
+        }
+    }
+
     public void putS3Object(String keyName) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -46,25 +53,14 @@ public class S3Service {
         }
     }
 
-    public static S3Client getS3Client() {
-        if (s3Client != null) {
-            return s3Client;
-        } else {
-            throw new S3ServiceException("Failed to retrieve S3 client!", new Exception("S3 Client error"));
-        }
-    }
-
-    public String getS3PreSignedUrl(String keyName, Map<String, String> metadata, String contentType) {
+    public String getS3PreSignedUrl(String keyName) {
         try (S3Presigner s3Presigner = S3Presigner.builder().region(Region.AP_SOUTH_1).credentialsProvider(DefaultCredentialsProvider.create()).build()) {
 
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).contentType(contentType).metadata(metadata).build();
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).build();
 
             PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(Integer.parseInt(duration))).putObjectRequest(putObjectRequest).build();
 
             PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(putObjectPresignRequest);
-
-            logger.info("Presigned URL to upload a file to: [{}]", presignedPutObjectRequest.url().toString());
-            logger.info("HTTP method: [{}]", presignedPutObjectRequest.httpRequest().method());
 
             return presignedPutObjectRequest.url().toString();
         } catch (Exception exception) {

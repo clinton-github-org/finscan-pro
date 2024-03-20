@@ -14,7 +14,6 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -33,10 +32,10 @@ public class InputControllerTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testProcessNewRequest() throws JsonProcessingException {
-        String requestBody = "{\"fileName\":\"dummy.pdf\", \"contentType\": \"application/pdf\"}";
+        String requestBody = "{\"fileName\":\"dummy.pdf\"}";
         String expectedUrl = "http://example.com/presigned-url";
 
-        when(s3Service.getS3PreSignedUrl(anyString(), anyMap(), anyString())).thenReturn(expectedUrl);
+        when(s3Service.getS3PreSignedUrl(anyString())).thenReturn(expectedUrl);
         doNothing().when(s3Service).putS3Object(anyString());
 
         ResponseEntity<Object> response = inputController.processNewRequest(requestBody);
