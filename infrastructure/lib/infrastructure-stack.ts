@@ -97,6 +97,7 @@ export class InfrastructureStack extends cdk.Stack {
       distribution,
       distributionPaths: ['/*'],
     });
+    bucketDeployment.node.addDependency(distribution);
 
     this.outputs = [
       new CfnOutput(this, 'UI_URL', {
