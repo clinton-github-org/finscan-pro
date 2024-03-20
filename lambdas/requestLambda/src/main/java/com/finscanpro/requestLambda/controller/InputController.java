@@ -31,7 +31,7 @@ public class InputController {
     public ResponseEntity<Object> processNewRequest(@RequestBody String requestBody) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode requestJson = mapper.readTree(requestBody);
-        String fileName = String.valueOf(requestJson.get("fileName"));
+        String fileName = requestJson.get("fileName").textValue();
         Map<String, Object> body = new HashMap<>();
         Map<String, String> metadata = new HashMap<>();
         UUID uuid = UUID.randomUUID();
