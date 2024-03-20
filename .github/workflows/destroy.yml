@@ -1,4 +1,4 @@
-name: Destroy Stack on AWS 💣🔴
+name: Destroy Stack on AWS 🔴
 
 on:
   workflow_dispatch:
@@ -29,6 +29,21 @@ jobs:
         with:
           role-to-assume: ${{ secrets.OIDC_GITHUB_AWS_ROLE }}
           aws-region: ap-south-1
+
+      - name: Run FrontEnd Build
+        run: yarn fe:build
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Build Request Lambda
+        run: yarn be:rl:build
+
+      - name: Run Synth CDK
+        run: yarn run cdk:synth
 
       - name: Destroy Stack
         run: yarn run cdk:destroy
