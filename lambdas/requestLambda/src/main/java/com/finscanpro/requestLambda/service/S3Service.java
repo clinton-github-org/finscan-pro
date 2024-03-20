@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
@@ -54,7 +53,7 @@ public class S3Service {
     }
 
     public String getS3PreSignedUrl(String keyName) {
-        try (S3Presigner s3Presigner = S3Presigner.builder().region(Region.AP_SOUTH_1).credentialsProvider(DefaultCredentialsProvider.create()).build()) {
+        try (S3Presigner s3Presigner = S3Presigner.builder().region(Region.AP_SOUTH_1).build()) {
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).build();
 
